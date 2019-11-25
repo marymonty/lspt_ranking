@@ -115,12 +115,17 @@ def Compile_Scores(occ_scores: {any : float},
 
 def Get_Weights() -> {str : float}:
     """
-    
-    Is this just to calculate our weights? We need a detailed description on how this will actually mathematically
-    be calculated.
+    Get a list of weights and their values to use in the ranking process.
 
-    gets weights to use in the sum
+    This function will return the weights that are given to each category of measurement, and return them to use 
+	in compile scores.
 
-    returns list of weight names with their values
+	Params:
+		None
+
+	Returns:
+		-the JSON Dictionary Weights of each category.
+
+   
     """
     pass
