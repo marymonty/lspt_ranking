@@ -54,12 +54,10 @@ def Get_Prelim_Documents(words: [any]) -> {any : { tf: [int], idf: [int], tf-idf
 def Get_Link_Analysis(docids: [any]) -> {any : float}:
     """Get_Link_Analysis will be a function to interact with Link Analysis.
 
-    This function will call link analysis to get their pagerank ranked list of urls. We will send them a list of urls as a json object
-    and they will rank them based on their internal graph and will return to us a list of urls with their accompanying pagerank scores
-    in the form { url1: { pagerank: int as string },
-                  url2: { pagerank: int as string } } 
-
-    *******************IS PAGERANK GOING TO BE AN INT OR A FLOAT AS A STRING**************************
+    This function will call link analysis to get their pagerank ranked list of docIDs. We will send them a list of docIDS as a json object
+    and they will rank them based on their internal graph and will return to us a list of docIDS with their accompanying pagerank scores
+    in the form { url1: { pagerank: float as string },
+                  url2: { pagerank: float as string } } 
 
     Params:
         -docids: the list of document ids (gotten from indexing)
