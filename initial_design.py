@@ -4,27 +4,24 @@ import requests  # Used to make HTTP requests in Python.
 # Internal global variable for weight storage.
 _weights = {}
 
-def POST(words: [str], 
-          weights: { "popularity": [float], "recency": [float], "exact": [bool] },
-          results: [int] )  -> {any : float}:
+def POST(words: [str],
+         weights: {"popularity": [float], "recency": [float], "exact": [bool]},
+         results: [int])  -> {any : float}:
     """POST guides a request through the ranking pipeline.
 
     Querying will call this POST with the user query. This function will take the actual words being
-    queried, the weights values, and results (a string representing an int of the number of results querying wants)
-    from the query. 
+    queried, the weights values, and results (a string representing an int of the number of results
+    querying wants) from the query.
     POST returns the compiled rankings relating to the user queries.
-
- -- popularity, recency, expressed as strings representing floats, floats, and 
-    bools
 
     Args:
         words: The user query, represented as a list of strings.
-        weights: A sequence of floats stipulating how each metric is weighted when computing scores.
+        weights: Floats stipulating how each metric is weighted when computing scores.
             popularity: How the popularity metric is weighted when computing overall score.
                         A float represented as a JSON string.
             recency: How the recency metric is weighted when computing overall score.
                      A float represented as a JSON string.
-            exact: Stipulates if exact match is used in the ranking process, in addition to partial match.
+            exact: Stipulates if exact match is used in the ranking process.
                      A boolean represented as a JSON string.
         results: How many results to be returned, represented as a string representing an integer.
 
@@ -43,7 +40,7 @@ def POST(words: [str],
         elif metric == 'exact' and weight == 'True':
             empty_fields += 1
         else:
-            _weights[metric] = float(weight)  # Turn non-zero JSON string into its represented float.
+            _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
             total += float(weight)
 
     if not total == 1.0:
@@ -51,13 +48,13 @@ def POST(words: [str],
         for (metric, weight) in _weights:
             if weight == '':
                 _weights[metric] = remainder
-    
+
     pass
 
-def Get_Prelim_Documents(words: [any]) -> {any : { "tf": [int], "idf": [int], "tf-idf": [int] }}:
+def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Get_Prelim_Documents will use the query to get initial scores on the query.
 
-    This function will call text transformation first to get all possible n-grams from the query 
+    This function will call text transformation first to get all possible n-grams from the query
     (1-grams, 2-grams, 3-grams etc) (for example: if query is "where in new york is rpi" we would get 1-grams 
     [where, new, york, rpi], 2-grams [where new, new york, york rpi], 3-grams [where new york, new york rpi], 
     and 4-grams [where new york rpi]). The function will then take all of these n-grams and send them to indexing 
