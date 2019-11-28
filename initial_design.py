@@ -4,6 +4,16 @@ import requests  # Used to make HTTP requests in Python.
 # Internal global variable for weight storage.
 _weights = {}
 
+def _get_weights() -> {str : float}:
+    """Returns the weight values to use in the ranking process.
+
+    This function will return the weights that are given to each category of measurement.
+
+	Returns:
+		A JSON dictionary of each category's weight.
+    """
+    return _weights
+    
 def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
     """Updates the internal global _weights variable.
 
@@ -161,17 +171,5 @@ def _compile_scores(occ_scores: {any : float},
         The format would be like so:
             { docID1: { ranking: float as string },
               docID2: { ranking: float as string } }.
-    """
-    pass
-
-def get_weights() -> {str : float}:
-    """
-    Get a list of weights and their values to use in the ranking process.
-
-    This function will return the weights that are given to each category of measurement, and return them to use 
-	in compile scores.
-
-	Returns:
-		A JSON dictionary of each category's weight.
     """
     pass
