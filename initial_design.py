@@ -7,7 +7,7 @@ _weights = {}
 def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
     """Updates the internal global _weights variable.
 
-    Internal function. Ensures all weights sum up to 1, and sets the _weights variable accordingly.
+    Ensures all weights sum up to 1, and sets the _weights variable accordingly.
 
     Args:
         weights: Floats stipulating how each metric is weighted when computing scores.
@@ -31,12 +31,11 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
             _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
             total += float(weight)
 
-    if not total == 1.0:
+    if total != 1.0:
         remainder = float(total/empty_fields)
         for (metric, weight) in _weights:
             if weight == '':
                 _weights[metric] = remainder
-
 
 def POST(words: [str],
          weights: {"popularity": [float], "recency": [float], "exact": [bool]},
@@ -68,7 +67,13 @@ def POST(words: [str],
                      These scores are compiled via their occurrence score, link score, and metadata.
     """
     _update_weights(weights)
-    pass
+    doc_ids_to_occ_scores = _get_prelim_documents(words)
+    doc_ids = list(doc_ids_to_occ_scores.keys())
+    occ_scores = list(doc_ids_to_occ_scores.values())
+    link_scores = _get_link_analysis(doc_ids)
+    meta_scores = _get_metadata_score(doc_ids)
+    
+    return _compile_scores(occ_scores, link_scores, meta_scores)
 
 def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
@@ -96,41 +101,39 @@ def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "t
     """
     pass
 
-def _get_link_analysis(docids: [any]) -> {any : float}:
-    """Get_Link_Analysis will be a function to interact with Link Analysis.
+def _get_link_analysis(doc_ids: [any]) -> {any : float}:
+    """Retrieves document IDs' PageRank scores from Link Analysis.
 
-    This function will call link analysis to get their pagerank ranked list of urls. We will send them a list of
-    urls as a json object and they will rank them based on their internal graph and will return to us a list of 
-    urls with their accompanying pagerank scores 
-    in the form { url1: { pagerank: int as string },
-                  url2: { pagerank: int as string } } 
-
-    ****************** PAGERANK IS GOING FLOAT AS A STRING**************************
+    Calls Link Analysis with a list of document IDs as a JSON object to retrieve a PageRank ranked
+    list of document IDs.
+    These PageRank scores are based on their internal graph representation.
 
     Args:
-        -docids: the list of document ids (gotten from indexing)
+        doc_ids: A list of document ids.
 
     Returns:
-        -link_scores: the json string of the list of urls and their pagerank scores in the format:
-            { url1: { pagerank: int as string },
-              url2: { pagerank: int as string } }
-            if any of the links are not in the link_analysis graph they return a score of 0 for pagerank
+        link_scores: A JSON string of the list of document IDs, with their respecctive PageRank
+                     scores in the format:
+                     { url1: { pagerank: int as string },
+                       url2: { pagerank: int as string } }.
+                     If any of the document IDs are not in Link Analysis's internal graph, a
+                     PageRank score of 0 is returned.
     """
     pass
 
-def _get_metadata_score(docids: [any]) -> {any : float}:
-    """Get_Metadata_Score is a function to get any needed metadata information from DDS.
+def _get_metadata_score(doc_ids: [any]) -> {any : float}:
+    """Retrieves metadata information pertaining to the document IDs.
 
-    This function will be called if we need any other metadata from Document Data Stroage that we may need to 
-    rank. We use DDS to call a GET command. Metadata will return to us the response GET command which will either 
+    Called if additional metadata from Document Data Storage is necessary for ranking.
+    We use DDS to call a GET command. Metadata will return to us the response GET command which will either 
     contain an error message or the document and all information that DDS has on the document (url, id, title, 
     body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors)
 
     Args:
-        -docids: the json string of a list of document ids
+        doc_ids: A list of document ids.
 
     Returns:
-        -meta_scores: any of the useful data gotten from the DDS GET response
+        meta_scores: A dictionary of metadata values pertaining to each document ID key.
     """
     pass
 
