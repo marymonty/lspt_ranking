@@ -43,10 +43,14 @@ def POST(words: [str],
          results: [int])  -> {any : float}:
     """POST guides a request through the ranking pipeline.
 
-    Querying will call this POST with the user query. This function will take the actual words being
-    queried, the weights values, and results (a string representing an int of the number of results
-    querying wants) from the query.
-    POST returns the compiled rankings relating to the user queries.
+    Querying will call this with the user's query, which is sent to Text Transformation. They
+    return all valid n-grams, which are then passed to Indexing through exact match. Indexing
+    returns relevant document IDs with their respective occurrence scores. These document IDs
+    are sent to Link Analysis and Document Data Storage, which respectively return the PageRank
+    scores and stored metadata for each document ID sent.
+
+    The occurrence scores, PageRank scores, and stored metadata are compiled into an overall
+    ranking score, which is returned to the initial callee.
 
     Args:
         words: The user query, represented as a list of strings.
@@ -67,9 +71,9 @@ def POST(words: [str],
     pass
 
 def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
-    """Retrieves initial scores corresponding to the query words.
+    """Retrieves the document IDs corresponding to the query words.
 
-    1. Calls text transformation to extract all n-grams (n = 1, 2, 3, ...) from the query.
+    1. Calls Text Transformation to extract all n-grams (n = 1, 2, 3, ....) from the query.
     For example:
         If the query is "where in new york is rpi", the resulting n-grams would be:
         unigrams: [where, new, york, rpi],
