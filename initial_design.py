@@ -1,3 +1,8 @@
+"""Implementation of ranking team functionality.
+
+TODO: Write up overall description of the module or program, as well as contain a typical usage
+example.
+"""
 import json
 import requests  # Used to make HTTP requests in Python.
 
@@ -13,7 +18,7 @@ def _get_weights() -> {str : float}:
 		A JSON dictionary of each category's weight.
     """
     return _weights
-    
+
 def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
     """Updates the internal global _weights variable.
 
@@ -137,7 +142,7 @@ def _get_metadata_score(doc_ids: [any]) -> {any : any}:
     Called if additional metadata from Document Data Storage (DDS) is necessary for ranking.
     DDS is called via a GET request containing document IDs, the metadata of which is returned via
     a GET response containing either an error message, or a dictionary containing all the
-    information that DDS has on the corresponding document (e.g. URL, id, title, 
+    information that DDS has on the corresponding document (e.g. URL, id, title,
     body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors, et cetera).
 
     Args:
@@ -148,9 +153,9 @@ def _get_metadata_score(doc_ids: [any]) -> {any : any}:
     """
     pass
 
-def _compile_scores(occ_scores: {any : float}, 
-                    link_scores: {any : float}, 
-                    meta_scores: {any : float}) -> {any : float}: 
+def _compile_scores(occ_scores: {any : float},
+                    link_scores: {any : float},
+                    meta_scores: {any : float}) -> {any : float}:
     """Combines retrieved scores to form an overall ranking score.
 
     Compiles the occurrence, link/PageRank, and metadata scores via a weighted sum. The result will
@@ -158,13 +163,13 @@ def _compile_scores(occ_scores: {any : float},
     0 and 1.
 
     Args:
-        -occ_scores: the occurrence scores we received from indexing (a json string of 
+        occ_scores: The occurrence scores received from Indexing. A JSON string formatted like so:
             { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
-              docID2 : [tf: int as string, idf: int as string, tf-idf: int as string]  })
-        -link_scores: the pagerank scores we received from link analysis (a json string of 
+              docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }).
+        link_scores: The PageRank scores received from Link Analysis. A JSON string like so:
             { url1: { pagerank: int as string },
-              url2: { pagerank: int as string } })
-        -meta_scores: the scores of any other metrics we recieved from document data storage
+              url2: { pagerank: int as string } }).
+        meta_scores: The scores of other metrics recieved from Document Data Storage.
 
     Returns:
         A JSON string list of document ids with their accompanying scores (between 0 and 1).
