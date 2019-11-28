@@ -1,51 +1,72 @@
 import json
+import requests  # Used to make HTTP requests in Python.
 
+# Internal global variable for weight storage.
+_weights = {}
 
+def POST(words: [str],
+         weights: {"popularity": [float], "recency": [float], "exact": [bool]},
+         results: [int])  -> {any : float}:
+    """POST guides a request through the ranking pipeline.
 
-
-
-def POST(words: [str], 
-          weights: { popularity: [float], recency: [float], exact: [bool] },
-          results: [int] )  -> {any : float}:
-    """Post guides a request through the ranking process.
-
-    Querying will call this POST with the user query. This function will take the words (query), 
-    weights (three groups of weights: popularity, recency, expressed as strings representing floats, floats, and bools),
-    and results (a string representing an int of the number of results querying wants) and will make internal calls 
-    to pass this information to other functions to eventually rank and return.
+    Querying will call this POST with the user query. This function will take the actual words being
+    queried, the weights values, and results (a string representing an int of the number of results
+    querying wants) from the query.
+    POST returns the compiled rankings relating to the user queries.
 
     Args:
-        -words: the query, represented as a string
-        -weights: -popularity: the popularity metric the user wants weighted by, a float represented as a string in json
-                  -recency: the recency metric the user wants weighted by, a float represented as a string in json
-                  -exact: the exact metric if the user wants exact match, a boolean true or false represented as a json string
-        -results: an integer of how many results UI wants to display
+        words: The user query, represented as a list of strings.
+        weights: Floats stipulating how each metric is weighted when computing scores.
+            popularity: How the popularity metric is weighted when computing overall score.
+                        A float represented as a JSON string.
+            recency: How the recency metric is weighted when computing overall score.
+                     A float represented as a JSON string.
+            exact: Stipulates if exact match is used in the ranking process.
+                     A boolean represented as a JSON string.
+        results: How many results to be returned, represented as a string representing an integer.
 
     Returns:
-        -ranked_list: a list of documents and their scores (compiled via their occurance score, link score, and metadata) in a json string 
+        ranked_list: A list of documents and their respective scores as a JSON string.
+                     These scores are compiled via their occurrence score, link score, and metadata.
     """
+    # Initialize the internal _weights variable, and ensure that all weights sum up to 1.
+    total = 0.0
+    empty_fields = 0
+
+    _weights = weights
+    for (metric, weight) in _weights:
+        if weight == '':
+            empty_fields += 1
+        elif metric == 'exact' and weight == 'True':
+            empty_fields += 1
+        else:
+            _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
+            total += float(weight)
+
+    if not total == 1.0:
+        remainder = float(total/empty_fields)
+        for (metric, weight) in _weights:
+            if weight == '':
+                _weights[metric] = remainder
+
     pass
 
-
-
-#(we will make all of these comments formatted correctly, but we have not gotten to do it yet so here are simple descriptions)
-
-
-
-def Get_Prelim_Documents(words: [any]) -> {any : { tf: [int], idf: [int], tf-idf: [int] }}:
+def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Get_Prelim_Documents will use the query to get initial scores on the query.
 
-    This function will call text transformation first to get all possible n-grams from the query (1-grams, 2-grams, 3-grams etc) 
-    (for example: if query is "where in new york is rpi" we would get 1-grams [where, new, york, rpi], 2-grams [where new, new york, york rpi],
-    3-grams [where new york, new york rpi], and 4-grams [where new york rpi]). The function will then take all of these n-grams and send them
-    to indexing through their exact match function. Indexing will return to us the document ids with their occurrence scores in the form of 
-    { doc : [tf: int as string, idf: int as string, tf-idf: int as string] }
+    This function will call text transformation first to get all possible n-grams from the query
+    (1-grams, 2-grams, 3-grams etc) (for example: if query is "where in new york is rpi" we would get 1-grams 
+    [where, new, york, rpi], 2-grams [where new, new york, york rpi], 3-grams [where new york, new york rpi], 
+    and 4-grams [where new york rpi]). The function will then take all of these n-grams and send them to indexing 
+    hrough their exact match function. Indexing will return to us the document ids with their occurrence scores in 
+    the form of { doc : [tf: int as string, idf: int as string, tf-idf: int as string] }
 
     Params:
         -words: the query, represented as a string
 
     Returns:
-        -occ_scores- the json string list of document ids, with their accompanying tf, idf, and tf-idf scores as int written as strings
+        -occ_scores- the json string list of document ids, with their accompanying tf, idf, and tf-idf scores as 
+        	int written as strings
             in the form { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
                           docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }
     """
@@ -54,10 +75,13 @@ def Get_Prelim_Documents(words: [any]) -> {any : { tf: [int], idf: [int], tf-idf
 def Get_Link_Analysis(docids: [any]) -> {any : float}:
     """Get_Link_Analysis will be a function to interact with Link Analysis.
 
-    This function will call link analysis to get their pagerank ranked list of docIDs. We will send them a list of docIDS as a json object
-    and they will rank them based on their internal graph and will return to us a list of docIDS with their accompanying pagerank scores
-    in the form { url1: { pagerank: float as string },
-                  url2: { pagerank: float as string } } 
+    This function will call link analysis to get their pagerank ranked list of urls. We will send them a list of
+    urls as a json object and they will rank them based on their internal graph and will return to us a list of 
+    urls with their accompanying pagerank scores 
+    in the form { url1: { pagerank: int as string },
+                  url2: { pagerank: int as string } } 
+
+    ****************** PAGERANK IS GOING FLOAT AS A STRING**************************
 
     Params:
         -docids: the list of document ids (gotten from indexing)
@@ -73,10 +97,10 @@ def Get_Link_Analysis(docids: [any]) -> {any : float}:
 def Get_Metadata_Score(docids: [any]) -> {any : float}:
     """Get_Metadata_Score is a function to get any needed metadata information from DDS.
 
-    This function will be called if we need any other metadata from Document Data Stroage that we may need to rank.
-    We use DDS to call a GET command. Metadata will return to us the response GET command which will either contain 
-    an error message or the document and all information that DDS has on the document (url, id, title, body, words, 
-    bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors)
+    This function will be called if we need any other metadata from Document Data Stroage that we may need to 
+    rank. We use DDS to call a GET command. Metadata will return to us the response GET command which will either 
+    contain an error message or the document and all information that DDS has on the document (url, id, title, 
+    body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors)
 
     Params:
         -docids: the json string of a list of document ids
@@ -123,7 +147,5 @@ def Get_Weights() -> {str : float}:
 
 	Returns:
 		-the JSON Dictionary Weights of each category.
-
-   
     """
     pass
