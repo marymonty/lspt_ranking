@@ -1,42 +1,60 @@
 import json
+import requests  # Used to make HTTP requests in Python.
 
-
-
-
+# Internal global variable for weight storage.
+_weights = {}
 
 def POST(words: [str], 
-          weights: { popularity: [float], recency: [float], exact: [bool] },
+          weights: { "popularity": [float], "recency": [float], "exact": [bool] },
           results: [int] )  -> {any : float}:
-    """Post guides a request through the ranking process.
+    """POST guides a request through the ranking pipeline.
 
-    Querying will call this POST with the user query. This function will take the words (query), 
-    weights (three groups of weights: popularity, recency, expressed as strings representing floats, floats, and 
-    bools), and results (a string representing an int of the number of results querying wants) and will make 
-    internal calls to pass this information to other functions to eventually rank and return.
+    Querying will call this POST with the user query. This function will take the actual words being
+    queried, the weights values, and results (a string representing an int of the number of results querying wants)
+    from the query. 
+    POST returns the compiled rankings relating to the user queries.
+
+ -- popularity, recency, expressed as strings representing floats, floats, and 
+    bools
 
     Args:
-        -words: the query, represented as a string
-        -weights: -popularity: the popularity metric the user wants weighted by, a float represented as a string 
-        		    in json
-                  -recency: the recency metric the user wants weighted by, a float represented as a string in json
-                  -exact: the exact metric if the user wants exact match, a boolean true or false represented as a
-                      json string
-        -results: an integer of how many results UI wants to display
+        words: The user query, represented as a list of strings.
+        weights: A sequence of floats stipulating how each metric is weighted when computing scores.
+            popularity: How the popularity metric is weighted when computing overall score.
+                        A float represented as a JSON string.
+            recency: How the recency metric is weighted when computing overall score.
+                     A float represented as a JSON string.
+            exact: Stipulates if exact match is used in the ranking process, in addition to partial match.
+                     A boolean represented as a JSON string.
+        results: How many results to be returned, represented as a string representing an integer.
 
     Returns:
-        -ranked_list: a list of documents and their scores (compiled via their occurance score, link score, and 
-            metadata) in a json string 
+        ranked_list: A list of documents and their respective scores as a JSON string.
+                     These scores are compiled via their occurrence score, link score, and metadata.
     """
+    # Initialize the internal _weights variable, and ensure that all weights sum up to 1.
+    total = 0.0
+    empty_fields = 0
+
+    _weights = weights
+    for (metric, weight) in _weights:
+        if weight == '':
+            empty_fields += 1
+        elif metric == 'exact' and weight == 'True':
+            empty_fields += 1
+        else:
+            _weights[metric] = float(weight)  # Turn non-zero JSON string into its represented float.
+            total += float(weight)
+
+    if not total == 1.0:
+        remainder = float(total/empty_fields)
+        for (metric, weight) in _weights:
+            if weight == '':
+                _weights[metric] = remainder
+    
     pass
 
-
-
-#(we will make all of these comments formatted correctly, but we have not gotten to do it yet so here 
-#are simple descriptions)
-
-
-
-def Get_Prelim_Documents(words: [any]) -> {any : { tf: [int], idf: [int], tf-idf: [int] }}:
+def Get_Prelim_Documents(words: [any]) -> {any : { "tf": [int], "idf": [int], "tf-idf": [int] }}:
     """Get_Prelim_Documents will use the query to get initial scores on the query.
 
     This function will call text transformation first to get all possible n-grams from the query 
@@ -132,7 +150,5 @@ def Get_Weights() -> {str : float}:
 
 	Returns:
 		-the JSON Dictionary Weights of each category.
-
-   
     """
     pass
