@@ -70,7 +70,7 @@ def POST(words: [str],
     _update_weights(weights)
     pass
 
-def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
+def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
 
     1. Calls Text Transformation to extract all n-grams (n = 1, 2, 3, ....) from the query.
@@ -96,7 +96,7 @@ def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf
     """
     pass
 
-def Get_Link_Analysis(docids: [any]) -> {any : float}:
+def _get_link_analysis(docids: [any]) -> {any : float}:
     """Get_Link_Analysis will be a function to interact with Link Analysis.
 
     This function will call link analysis to get their pagerank ranked list of urls. We will send them a list of
@@ -107,7 +107,7 @@ def Get_Link_Analysis(docids: [any]) -> {any : float}:
 
     ****************** PAGERANK IS GOING FLOAT AS A STRING**************************
 
-    Params:
+    Args:
         -docids: the list of document ids (gotten from indexing)
 
     Returns:
@@ -118,7 +118,7 @@ def Get_Link_Analysis(docids: [any]) -> {any : float}:
     """
     pass
 
-def Get_Metadata_Score(docids: [any]) -> {any : float}:
+def _get_metadata_score(docids: [any]) -> {any : float}:
     """Get_Metadata_Score is a function to get any needed metadata information from DDS.
 
     This function will be called if we need any other metadata from Document Data Stroage that we may need to 
@@ -126,7 +126,7 @@ def Get_Metadata_Score(docids: [any]) -> {any : float}:
     contain an error message or the document and all information that DDS has on the document (url, id, title, 
     body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors)
 
-    Params:
+    Args:
         -docids: the json string of a list of document ids
 
     Returns:
@@ -134,7 +134,7 @@ def Get_Metadata_Score(docids: [any]) -> {any : float}:
     """
     pass
 
-def Compile_Scores(occ_scores: {any : float}, 
+def _compile_scores(occ_scores: {any : float}, 
                     link_scores: {any : float}, 
                     meta_scores: {any : float}) -> {any : float}: 
     """Compile_Scores is our internal ranking function.
@@ -143,7 +143,7 @@ def Compile_Scores(occ_scores: {any : float},
     metadata scores from document data storage. We will compile these scores by ???????????????. The result will
     be a json list of the document ids with their normalized scores as floats between 0 and 1.
 
-    Params:
+    Args:
         -occ_scores: the occurrence scores we received from indexing (a json string of 
             { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
               docID2 : [tf: int as string, idf: int as string, tf-idf: int as string]  })
@@ -159,15 +159,12 @@ def Compile_Scores(occ_scores: {any : float},
     """
     pass
 
-def Get_Weights() -> {str : float}:
+def get_weights() -> {str : float}:
     """
     Get a list of weights and their values to use in the ranking process.
 
     This function will return the weights that are given to each category of measurement, and return them to use 
 	in compile scores.
-
-	Params:
-		None
 
 	Returns:
 		-the JSON Dictionary Weights of each category.
