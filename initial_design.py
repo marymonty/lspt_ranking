@@ -4,6 +4,40 @@ import requests  # Used to make HTTP requests in Python.
 # Internal global variable for weight storage.
 _weights = {}
 
+def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
+    """Updates the internal global _weights variable.
+
+    Internal function. Ensures all weights sum up to 1, and sets the _weights variable accordingly.
+
+    Args:
+        weights: Floats stipulating how each metric is weighted when computing scores.
+            popularity: How the popularity metric is weighted when computing overall score.
+                        A float represented as a JSON string.
+            recency: How the recency metric is weighted when computing overall score.
+                     A float represented as a JSON string.
+            exact: Stipulates if exact match is used in the ranking process.
+                     A boolean represented as a JSON string.
+    """
+    total = 0.0
+    empty_fields = 0
+
+    _weights = weights
+    for (metric, weight) in _weights:
+        if weight == '':
+            empty_fields += 1
+        elif metric == 'exact' and weight == 'True':
+            empty_fields += 1
+        else:
+            _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
+            total += float(weight)
+
+    if not total == 1.0:
+        remainder = float(total/empty_fields)
+        for (metric, weight) in _weights:
+            if weight == '':
+                _weights[metric] = remainder
+
+
 def POST(words: [str],
          weights: {"popularity": [float], "recency": [float], "exact": [bool]},
          results: [int])  -> {any : float}:
@@ -29,45 +63,31 @@ def POST(words: [str],
         ranked_list: A list of documents and their respective scores as a JSON string.
                      These scores are compiled via their occurrence score, link score, and metadata.
     """
-    # Initialize the internal _weights variable, and ensure that all weights sum up to 1.
-    total = 0.0
-    empty_fields = 0
-
-    _weights = weights
-    for (metric, weight) in _weights:
-        if weight == '':
-            empty_fields += 1
-        elif metric == 'exact' and weight == 'True':
-            empty_fields += 1
-        else:
-            _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
-            total += float(weight)
-
-    if not total == 1.0:
-        remainder = float(total/empty_fields)
-        for (metric, weight) in _weights:
-            if weight == '':
-                _weights[metric] = remainder
-
+    _update_weights(weights)
     pass
 
 def Get_Prelim_Documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
-    """Get_Prelim_Documents will use the query to get initial scores on the query.
+    """Retrieves initial scores corresponding to the query words.
 
-    This function will call text transformation first to get all possible n-grams from the query
-    (1-grams, 2-grams, 3-grams etc) (for example: if query is "where in new york is rpi" we would get 1-grams 
-    [where, new, york, rpi], 2-grams [where new, new york, york rpi], 3-grams [where new york, new york rpi], 
-    and 4-grams [where new york rpi]). The function will then take all of these n-grams and send them to indexing 
-    hrough their exact match function. Indexing will return to us the document ids with their occurrence scores in 
-    the form of { doc : [tf: int as string, idf: int as string, tf-idf: int as string] }
+    1. Calls text transformation to extract all n-grams (n = 1, 2, 3, ...) from the query.
+    For example:
+        If the query is "where in new york is rpi", the resulting n-grams would be:
+        unigrams: [where, new, york, rpi],
+        bigrams: [where new, new york, york rpi],
+        trigrams: [where new york, new york rpi],
+        4-grams: [where new york rpi]).
+    2. Send all resulting n-grams to Indexing through exact match. In turn, Indexing returns the
+    document IDs with their corresponding occurrence scores like so:
+    { doc : [tf: int as string, idf: int as string, tf-idf: int as string] }.
 
-    Params:
-        -words: the query, represented as a string
+    Args:
+        words: The query, represented as a string.
 
     Returns:
-        -occ_scores- the json string list of document ids, with their accompanying tf, idf, and tf-idf scores as 
-        	int written as strings
-            in the form { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
+        occ_scores: A JSON string list of document IDs, with their respective TF, IDF, and
+                    TF-IDF scores, all in string form.
+                    The overall resulting form is like so:
+                        { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
                           docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }
     """
     pass
