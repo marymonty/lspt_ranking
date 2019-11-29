@@ -14,8 +14,8 @@ $ git clone ...
 ```
 
 # At the end should look like: 
-lspt_ranking  
 ```
+lspt_ranking  
 ├── .venv  
 └── lspt_ranking  
   ├── __init__.py  
