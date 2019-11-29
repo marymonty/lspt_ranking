@@ -13,19 +13,19 @@ $ git clone ...
 
 # At the end should look like: 
 lspt_ranking
-> ├── .venv  
-> └── lspt_ranking  
->   ├── __init__.py  
->   └── app.py  
+    ├── .venv  
+    └── lspt_ranking  
+      ├── __init__.py  
+      └── app.py  
 
 
 To run open up a new terminal  
-> $ source .venv/bin/activate  
-> $ pip install gunicorn  
-> $ gunicorn --reload lspt_ranking.app  
+    $ source .venv/bin/activate  
+    $ pip install gunicorn  
+    $ gunicorn --reload lspt_ranking.app  
 
 To call it open in a new terminal  
-> $ curl -v localhost:8000  
+    $ curl -v localhost:8000  
 
 Further reading:  
 https://falcon.readthedocs.io/en/stable/user/tutorial.html
