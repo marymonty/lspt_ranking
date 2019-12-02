@@ -6,20 +6,23 @@ from .errors import WeightNotExist
 def get_weights() -> {}:
     """Retrieves the weights to be used fro stable storage.
 
-    throws weight not exist if they do not exist
+    Raises:
+            WeightNotExist: If weights file does not exist.
 
     Returns:
         A dictionary with the float weight values.
     """
     if not os.path.exists(WEIGHT_PATH):
-        raise WeightNotExist('Weights file does not exist')
+        raise WeightNotExist('Weights file does not exist.')
 
     with open(WEIGHT_PATH, 'r') as f:
         weights = json.load(f)
         return weights
 
 def set_weights(popularity: float, recency: float, relevancy: float) -> bool:
-    if popularity + recency + relevancy != 1:
+    """Sets weights 
+    """
+    if popularity + recency + relevancy != 1.0:
         return False
     weights = {POPULARITY: popularity, RECENCY: recency, RELEVANCY: relevancy}
 

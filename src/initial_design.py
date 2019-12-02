@@ -39,7 +39,7 @@ def _get_weights() -> {str : float}:
     """
     return _weights
 
-def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
+def _update_weights(weights: {"popularity": float, "recency": float, "exact": bool}):
     """Updates the internal global _weights variable.
 
     Ensures all weights sum up to 1, and sets the _weights variable accordingly.
@@ -73,7 +73,7 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
                 _weights[metric] = remainder
 
 def GET(words: [str],
-         weights: {"popularity": [float], "recency": [float], "exact": [bool]} = None,
+         weights: {"popularity": float, "recency": float, "exact": bool} = None,
          n_results: int = 50)  -> {any : float}:
     """GET guides a request through the ranking pipeline.
 
@@ -117,7 +117,6 @@ def GET(words: [str],
         key = lambda x : x[1], reverse=True)]
     first_n_doc_ids_to_ranks = sorted_doc_ids_to_ranks[:n_results]
     return _convert_list_to_dict(first_n_doc_ids_to_ranks)
-
 
 def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
