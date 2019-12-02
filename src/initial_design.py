@@ -1,13 +1,28 @@
+"""Implementation of ranking team functionality.
+
+TODO: Write up overall description of the module or program, as well as contain a typical usage
+example.
+"""
 import json
 import requests  # Used to make HTTP requests in Python.
 
 # Internal global variable for weight storage.
 _weights = {}
 
+def _get_weights() -> {str : float}:
+    """Returns the weight values to use in the ranking process.
+
+    This function will return the weights that are given to each category of measurement.
+
+	Returns:
+		A JSON dictionary of each category's weight.
+    """
+    return _weights
+
 def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
     """Updates the internal global _weights variable.
 
-    Internal function. Ensures all weights sum up to 1, and sets the _weights variable accordingly.
+    Ensures all weights sum up to 1, and sets the _weights variable accordingly.
 
     Args:
         weights: Floats stipulating how each metric is weighted when computing scores.
@@ -31,16 +46,15 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
             _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
             total += float(weight)
 
-    if not total == 1.0:
+    if total != 1.0:
         remainder = float(total/empty_fields)
         for (metric, weight) in _weights:
             if weight == '':
                 _weights[metric] = remainder
 
-
-def POST(words: [str],
-         weights: {"popularity": [float], "recency": [float], "exact": [bool]},
-         results: [int])  -> {any : float}:
+def GET(words: [str],
+         weights: {"popularity": [float], "recency": [float], "exact": [bool]} = None,
+         n_results: [int] = [50])  -> {any : float}:
     """POST guides a request through the ranking pipeline.
 
     Querying will call this with the user's query, which is sent to Text Transformation. They
@@ -64,11 +78,17 @@ def POST(words: [str],
         results: How many results to be returned, represented as a string representing an integer.
 
     Returns:
-        ranked_list: A list of documents and their respective scores as a JSON string.
-                     These scores are compiled via their occurrence score, link score, and metadata.
+        A list of documents and their respective scores as a JSON string.
+        These scores are compiled via their occurrence score, link score, and metadata.
     """
     _update_weights(weights)
-    pass
+    doc_ids_to_occ_scores = _get_prelim_documents(words)
+    doc_ids = list(doc_ids_to_occ_scores.keys())
+    occ_scores = list(doc_ids_to_occ_scores.values())
+    link_scores = _get_link_analysis(doc_ids)
+    meta_scores = _get_metadata_score(doc_ids)
+
+    return _compile_scores(occ_scores, link_scores, meta_scores)
 
 def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
@@ -88,85 +108,73 @@ def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "t
         words: The query, represented as a string.
 
     Returns:
-        occ_scores: A JSON string list of document IDs, with their respective TF, IDF, and
-                    TF-IDF scores, all in string form.
-                    The overall resulting form is like so:
-                        { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
-                          docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }
-    """
-    pass
-
-def _get_link_analysis(docids: [any]) -> {any : float}:
-    """Get_Link_Analysis will be a function to interact with Link Analysis.
-
-    This function will call link analysis to get their pagerank ranked list of urls. We will send them a list of
-    urls as a json object and they will rank them based on their internal graph and will return to us a list of 
-    urls with their accompanying pagerank scores 
-    in the form { url1: { pagerank: int as string },
-                  url2: { pagerank: int as string } } 
-
-    ****************** PAGERANK IS GOING FLOAT AS A STRING**************************
-
-    Args:
-        -docids: the list of document ids (gotten from indexing)
-
-    Returns:
-        -link_scores: the json string of the list of urls and their pagerank scores in the format:
-            { url1: { pagerank: int as string },
-              url2: { pagerank: int as string } }
-            if any of the links are not in the link_analysis graph they return a score of 0 for pagerank
-    """
-    pass
-
-def _get_metadata_score(docids: [any]) -> {any : float}:
-    """Get_Metadata_Score is a function to get any needed metadata information from DDS.
-
-    This function will be called if we need any other metadata from Document Data Stroage that we may need to 
-    rank. We use DDS to call a GET command. Metadata will return to us the response GET command which will either 
-    contain an error message or the document and all information that DDS has on the document (url, id, title, 
-    body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors)
-
-    Args:
-        -docids: the json string of a list of document ids
-
-    Returns:
-        -meta_scores: any of the useful data gotten from the DDS GET response
-    """
-    pass
-
-def _compile_scores(occ_scores: {any : float}, 
-                    link_scores: {any : float}, 
-                    meta_scores: {any : float}) -> {any : float}: 
-    """Compile_Scores is our internal ranking function.
-
-    This function will take the occrrence scores from indexing, the pagerank scores from link analysis, and the 
-    metadata scores from document data storage. We will compile these scores by ???????????????. The result will
-    be a json list of the document ids with their normalized scores as floats between 0 and 1.
-
-    Args:
-        -occ_scores: the occurrence scores we received from indexing (a json string of 
+        A JSON string list of document IDs, with their respective TF, IDF, and TF-IDF scores,
+        all in string form.
+        The overall resulting form is like so:
             { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
-              docID2 : [tf: int as string, idf: int as string, tf-idf: int as string]  })
-        -link_scores: the pagerank scores we received from link analysis (a json string of 
-            { url1: { pagerank: int as string },
-              url2: { pagerank: int as string } })
-        -meta_scores: the scores of any other metrics we recieved from document data storage
-
-    Returns:
-        -ranking_scores: the json string list of document ids with their accompanying scores (between 0 and 1)
-            { docID1: { ranking: float as string },
-              docID2: { ranking: float as string } }
+              docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }
     """
     pass
 
-def get_weights() -> {str : float}:
+def _get_link_analysis(doc_ids: [any]) -> {any : float}:
+    """Retrieves document IDs' PageRank scores from Link Analysis.
+
+    Calls Link Analysis with a list of document IDs as a JSON object to retrieve a PageRank ranked
+    list of document IDs.
+    These PageRank scores are based on their internal graph representation.
+
+    Args:
+        doc_ids: A list of document ids.
+
+    Returns:
+        A JSON string of the list of document IDs, with their respecctive PageRank scores in the
+        format:
+            { url1: { pagerank: int as string },
+            url2: { pagerank: int as string } }.
+        If any of the document IDs are not in Link Analysis's internal graph, a PageRank score of
+        0 is returned.
     """
-    Get a list of weights and their values to use in the ranking process.
+    pass
 
-    This function will return the weights that are given to each category of measurement, and return them to use 
-	in compile scores.
+def _get_metadata_score(doc_ids: [any]) -> {any : any}:
+    """Retrieves metadata information pertaining to the document IDs.
 
-	Returns:
-		-the JSON Dictionary Weights of each category.
+    Called if additional metadata from Document Data Storage (DDS) is necessary for ranking.
+    DDS is called via a GET request containing document IDs, the metadata of which is returned via
+    a GET response containing either an error message, or a dictionary containing all the
+    information that DDS has on the corresponding document (e.g. URL, id, title,
+    body, words, bigrams, trigrams, crawledDateTime, recrawlDateTime, anchors, et cetera).
+
+    Args:
+        doc_ids: A list of document ids.
+
+    Returns:
+        A dictionary of metadata pertaining to each document ID key.
+    """
+    pass
+
+def _compile_scores(occ_scores: {any : float},
+                    link_scores: {any : float},
+                    meta_scores: {any : float}) -> {any : float}:
+    """Combines retrieved scores to form an overall ranking score.
+
+    Compiles the occurrence, link/PageRank, and metadata scores via a weighted sum. The result will
+    be a JSON list of the document ids, with their respective normalized scores as floats between
+    0 and 1.
+
+    Args:
+        occ_scores: The occurrence scores received from Indexing. A JSON string formatted like so:
+            { docID1 : [tf: int as string, idf: int as string, tf-idf: int as string],
+              docID2 : [tf: int as string, idf: int as string, tf-idf: int as string] }).
+        link_scores: The PageRank scores received from Link Analysis. A JSON string like so:
+            { url1: { pagerank: int as string },
+              url2: { pagerank: int as string } }).
+        meta_scores: The scores of other metrics recieved from Document Data Storage.
+
+    Returns:
+        A JSON string list of document ids with their accompanying scores (between 0 and 1).
+        The format would be like so:
+            { docID1: { ranking: float as string },
+              docID2: { ranking: float as string } }.
     """
     pass

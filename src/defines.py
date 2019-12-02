@@ -1,0 +1,5 @@
+POPULARITY = 'popularity'
+RECENCY = 'recency'
+RELEVANCY = 'relevancy'
+ENDPOINT_PATH = 'lspt_ranking/bin/endpoints.json'
+WEIGHT_PATH = 'lspt_ranking/bin/weight_file.json'
