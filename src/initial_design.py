@@ -9,6 +9,26 @@ import requests  # Used to make HTTP requests in Python.
 # Internal global variable for weight storage.
 _weights = {}
 
+def _convert_list_to_dict(old_list: [[any, float]]) -> {any, float}:
+    """Converts a list of tuples to a dictionary.
+
+    Each list element is a tuple composed of a (key, value) pair, where the key
+    represents the doc ID and the value is corresponding float rank. These are
+    converted to a dictionary with the same key value pairing, which is
+    returned to the end user.
+
+    Args:
+        old_list: Each element is a tuple composed of a corresponding key, value
+        pairing, where each key is the doc ID and its corresponding value is
+        its float rank value.
+
+    Returns:
+        A dictionary composed of a doc ID key mapped to its final ranking score.
+    """
+    list_to_dict = {
+        key : value for (i, [key, value]) in enumerate(old_list)}
+    return list_to_dict
+
 def _get_weights() -> {str : float}:
     """Returns the weight values to use in the ranking process.
 
@@ -54,8 +74,8 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
 
 def GET(words: [str],
          weights: {"popularity": [float], "recency": [float], "exact": [bool]} = None,
-         n_results: [int] = [50])  -> {any : float}:
-    """POST guides a request through the ranking pipeline.
+         n_results: int = 50)  -> {any : float}:
+    """GET guides a request through the ranking pipeline.
 
     Querying will call this with the user's query, which is sent to Text Transformation. They
     return all valid n-grams, which are then passed to Indexing through exact match. Indexing
@@ -68,18 +88,19 @@ def GET(words: [str],
 
     Args:
         words: The user query, represented as a list of strings.
-        weights: Floats stipulating how each metric is weighted when computing scores.
+        weights: Optional floats stipulating how each metric is weighted when computing scores.
             popularity: How the popularity metric is weighted when computing overall score.
                         A float represented as a JSON string.
             recency: How the recency metric is weighted when computing overall score.
                      A float represented as a JSON string.
             exact: Stipulates if exact match is used in the ranking process.
                      A boolean represented as a JSON string.
-        results: How many results to be returned, represented as a string representing an integer.
+        n_results: How many results to be returned, represented as a string representing an integer.
 
     Returns:
-        A list of documents and their respective scores as a JSON string.
-        These scores are compiled via their occurrence score, link score, and metadata.
+        A list of documents and their respective ranks as a JSON string.
+        These rankings are based off of compilations of their occurrence score, link score, and
+        metadata with either the default or manually entered weights.
     """
     _update_weights(weights)
     doc_ids_to_occ_scores = _get_prelim_documents(words)
@@ -88,7 +109,15 @@ def GET(words: [str],
     link_scores = _get_link_analysis(doc_ids)
     meta_scores = _get_metadata_score(doc_ids)
 
-    return _compile_scores(occ_scores, link_scores, meta_scores)
+    # Sorts the document IDs by their respective values from largest to smallest, and returns
+    # the first n_results doc IDs back to the user in dictionary form.
+    doc_ids_to_ranks = _compile_scores(occ_scores, link_scores, meta_scores)
+    sorted_doc_ids_to_ranks = [
+        [key, value] for (key, value) in sorted(doc_ids_to_ranks.items(),
+        key = lambda x : x[1], reverse=True)]
+    first_n_doc_ids_to_ranks = sorted_doc_ids_to_ranks[:n_results]
+    return _convert_list_to_dict(first_n_doc_ids_to_ranks)
+
 
 def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
@@ -178,3 +207,8 @@ def _compile_scores(occ_scores: {any : float},
               docID2: { ranking: float as string } }.
     """
     pass
+
+def main():
+    GET(["apple", "banana"])
+
+main()

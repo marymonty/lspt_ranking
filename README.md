@@ -1,9 +1,9 @@
 # lspt_ranking
-repo for Mary, Bill, Chris, and Alex to store their ranking project for large scale programming and testing
+Main repository for the Ranking team (Mary Montgomery, Bill Pedoto, Chris Tang, and Alex Garten) to store their project for Large Scale Programming & Testing.
 
-code so far is in the Development branch
+Code to be reviewed is pushed to the `development` branch.
 
-# To set up server from an empty directly  
+# To set up server from an empty directory.
 ```
 $ mkdir lspt_ranking  
 $ cd lspt_ranking  
@@ -13,7 +13,7 @@ $ pip install falcon
 $ git clone ...  
 ```
 
-# At the end should look like: 
+# The file hierarchy should look like this after setup:
 ```
 lspt_ranking  
 ├── .venv  
@@ -22,23 +22,23 @@ lspt_ranking
   └── app.py  
 ```
 
-To run open up a new terminal  
+# To run the server, open up a terminal and enter the following:
 ```
 $ source .venv/bin/activate  
 $ pip install gunicorn  
 $ gunicorn --reload lspt_ranking.app  
 ```
 
-To call it install httpie
+# To call the server, install httpie like so:
 ```
 $ source .venv/bin/activate
 $ pip install httpie
 $ http localhost:8000
 ```
-
+# To request the rankings for a certain query (for example, "apple banana"), call the endpoint with the request in list form.
 ```
 $ http localhost:8000/ranking?query=[\"apple\",\"banana\"]
 ```
 
-Further reading:  
+# Further reading regarding Falcon:  
 https://falcon.readthedocs.io/en/stable/user/tutorial.html
