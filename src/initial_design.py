@@ -207,8 +207,3 @@ def _compile_scores(occ_scores: {any : float},
               docID2: { ranking: float as string } }.
     """
     pass
-
-def main():
-    GET(["apple", "banana"])
-
-main()

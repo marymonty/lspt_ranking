@@ -4,13 +4,13 @@ from .defines import WEIGHT_PATH, POPULARITY, RELEVANCY, RECENCY
 from .errors import WeightNotExist
 
 def get_weights() -> {}:
-    '''
-    gets the different weights from stable storage
+    """Retrieves the weights to be used fro stable storage.
 
     throws weight not exist if they do not exist
 
-    returns a dictionary with all the weights
-    '''
+    Returns:
+        A dictionary with the float weight values.
+    """
     if not os.path.exists(WEIGHT_PATH):
         raise WeightNotExist('Weights file does not exist')
 
