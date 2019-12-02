@@ -52,9 +52,9 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
             if weight == '':
                 _weights[metric] = remainder
 
-def POST(words: [str],
-         weights: {"popularity": [float], "recency": [float], "exact": [bool]},
-         results: [int])  -> {any : float}:
+def GET(words: [str],
+         weights: {"popularity": [float], "recency": [float], "exact": [bool]} = None,
+         n_results: [int] = [50])  -> {any : float}:
     """POST guides a request through the ranking pipeline.
 
     Querying will call this with the user's query, which is sent to Text Transformation. They

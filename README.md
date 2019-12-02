@@ -29,9 +29,15 @@ $ pip install gunicorn
 $ gunicorn --reload lspt_ranking.app  
 ```
 
-To call it open in a new terminal  
+To call it install httpie
 ```
-$ curl -v localhost:8000  
+$ source .venv/bin/activate
+$ pip install httpie
+$ http localhost:8000
+```
+
+```
+$ http localhost:8000/ranking?query=[\"apple\",\"banana\"]
 ```
 
 Further reading:  
