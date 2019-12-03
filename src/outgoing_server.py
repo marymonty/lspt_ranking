@@ -1,24 +1,35 @@
-import requests
+"""Contains functionality for communicating with external teams.
+"""
 import json
-from .defines import ENDPOINT_PATH
-from .errors import EndpointException
+import requests
+from defines import ENDPOINT_PATH
+from errors import EndpointException
 
-def make_get_request(endpoint: str, params: {}) -> {}:
-    '''
-    param endpoint: name of endpoint
-    param params: whatever the parameters of the get request are
+def _make_get_request(endpoint: str, params: {}) -> {}:
+    """Makes a GET request to the endpoint specified with the params passed in.
 
-    throws: EndpointException. When the endpoint called is not inthe endpoints.json file
+    Ensures that the endpoint to be called is detailed as trusted and known on the
+    server's endpoint.json file. Makes a GET request to the corresponding endpoint
+    specified, with the params, and returns the corresponding response to the function
+    caller.
 
-    returns: whatever the request returned
+    Args:
+        endpoint: Endpoint's name.
+        params: The outgoing GET request's parameters.
 
-    '''
-    with open(ENDPOINT_PATH, 'r') as f:
-        endpoints = json.load(f)
-    
+    Raises:
+        EndpointException: When the endpoint called is not known; it does not exist
+        in the endpoints.json file on the server.
+
+    Returns:
+        The GET request's corresponding response.
+    """
+    with open(ENDPOINT_PATH, 'r') as file:
+        endpoints = json.load(file)
+
     if endpoint not in endpoints:
-        raise EndpointException("Endpoint called does not exist")
+        raise EndpointException("Endpoint called does not exist.")
 
-    res = requests.get(url = endpoints.get(url = 'url', params = params))
+    res = requests.get(url=endpoints.get(url='url', params=params))
 
     return res
