@@ -5,9 +5,11 @@ example.
 """
 import json
 import requests  # Used to make HTTP requests in Python.
+import local_weights
 
-# Internal global variable for weight storage.
-_weights = {}
+_DEFAULT_POPULARITY_WEIGHT = .5
+_DEFAULT_RECENCY_WEIGHT = .5
+_DEFAULT_EXACT_MATCH = False
 
 def _convert_list_to_dict(old_list: [[any, float]]) -> {any, float}:
     """Converts a list of tuples to a dictionary.
@@ -37,12 +39,16 @@ def _get_weights() -> {str : float}:
 	Returns:
 		A JSON dictionary of each category's weight.
     """
-    return _weights
+    return local_weights._get_weights()
 
-def _update_weights(weights: {"popularity": [float], "recency": [float], "exact": [bool]}):
+def _update_weights(weights:
+    {"popularity": float, "recency": float, "exact": bool}
+    = {"popularity": _DEFAULT_POPULARITY_WEIGHT,
+    "recency": _DEFAULT_RECENCY_WEIGHT,
+    "exact": _DEFAULT_EXACT_MATCH}):
     """Updates the internal global _weights variable.
 
-    Ensures all weights sum up to 1, and sets the _weights variable accordingly.
+    Ensures all weights sum up to 1, and stores the correct weights on stable storage.
 
     Args:
         weights: Floats stipulating how each metric is weighted when computing scores.
@@ -56,27 +62,29 @@ def _update_weights(weights: {"popularity": [float], "recency": [float], "exact"
     total = 0.0
     empty_fields = 0
 
-    _weights = weights
-    for (metric, weight) in _weights:
+    for (metric, weight) in weights:
         if weight == '':
             empty_fields += 1
         elif metric == 'exact' and weight == 'True':
-            empty_fields += 1
+            continue
         else:
-            _weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
+            weights[metric] = float(weight)  # Turn non-empty JSON string into a float.
             total += float(weight)
 
     if total != 1.0:
         remainder = float(total/empty_fields)
-        for (metric, weight) in _weights:
-            if weight == '':
-                _weights[metric] = remainder
+        for (metric, weight) in weights:
+            if weight == '' and metric != 'exact':
+                weights[metric] = remainder
+    local_weights._set_weights(weights["popularity"], weights["recency"], weights["exact"])
 
 def GET(words: [str],
-         weights: {"popularity": [float], "recency": [float], "exact": [bool]} = None,
+         weights: {"popularity": float, "recency": float, "exact": bool} = None,
          n_results: int = 50)  -> {any : float}:
     """GET guides a request through the ranking pipeline.
 
+    Sets the weights to be used to the defaults, unless the user stipulates certain weights
+    to be used.
     Querying will call this with the user's query, which is sent to Text Transformation. They
     return all valid n-grams, which are then passed to Indexing through exact match. Indexing
     returns relevant document IDs with their respective occurrence scores. These document IDs
@@ -84,7 +92,8 @@ def GET(words: [str],
     scores and stored metadata for each document ID sent.
 
     The occurrence scores, PageRank scores, and stored metadata are compiled into an overall
-    ranking score, which is returned to the initial callee.
+    ranking score. The doc IDs are then ordered from highest to lowest with regards to their
+    ranking score, the first n_results of which is returned to the initial callee.
 
     Args:
         words: The user query, represented as a list of strings.
@@ -102,7 +111,12 @@ def GET(words: [str],
         These rankings are based off of compilations of their occurrence score, link score, and
         metadata with either the default or manually entered weights.
     """
-    _update_weights(weights)
+    # If the caller manually specifies the weights to be used, update the weights in stable
+    # storage, after ensuring the weights are normalized.
+    if (weights != None):
+        _update_weights(weights)
+    else:
+        _update_weights()
     doc_ids_to_occ_scores = _get_prelim_documents(words)
     doc_ids = list(doc_ids_to_occ_scores.keys())
     occ_scores = list(doc_ids_to_occ_scores.values())
@@ -117,7 +131,6 @@ def GET(words: [str],
         key = lambda x : x[1], reverse=True)]
     first_n_doc_ids_to_ranks = sorted_doc_ids_to_ranks[:n_results]
     return _convert_list_to_dict(first_n_doc_ids_to_ranks)
-
 
 def _get_prelim_documents(words: [any]) -> {any : {"tf": [int], "idf": [int], "tf-idf": [int]}}:
     """Retrieves the document IDs corresponding to the query words.
@@ -207,8 +220,3 @@ def _compile_scores(occ_scores: {any : float},
               docID2: { ranking: float as string } }.
     """
     pass
-
-def main():
-    GET(["apple", "banana"])
-
-main()
