@@ -1,9 +1,9 @@
 """Contains functionality for communicating with external teams.
 """
-import requests
 import json
-from .defines import ENDPOINT_PATH
-from .errors import EndpointException
+import requests
+from defines import ENDPOINT_PATH
+from errors import EndpointException
 
 def _make_get_request(endpoint: str, params: {}) -> {}:
     """Makes a GET request to the endpoint specified with the params passed in.
@@ -24,12 +24,12 @@ def _make_get_request(endpoint: str, params: {}) -> {}:
     Returns:
         The GET request's corresponding response.
     """
-    with open(ENDPOINT_PATH, 'r') as f:
-        endpoints = json.load(f)
-    
+    with open(ENDPOINT_PATH, 'r') as file:
+        endpoints = json.load(file)
+
     if endpoint not in endpoints:
         raise EndpointException("Endpoint called does not exist.")
 
-    res = requests.get(url = endpoints.get(url = 'url', params = params))
+    res = requests.get(url=endpoints.get(url='url', params=params))
 
     return res
