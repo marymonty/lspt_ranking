@@ -3,8 +3,8 @@ import json
 from .defines import WEIGHT_PATH, POPULARITY, RELEVANCY, RECENCY
 from .errors import WeightNotExist
 
-def get_weights() -> {}:
-    """Retrieves the weights to be used fro stable storage.
+def _get_weights() -> {}:
+    """Retrieves the weights to be used from stable storage.
 
     Raises:
             WeightNotExist: If weights file does not exist.
@@ -19,8 +19,8 @@ def get_weights() -> {}:
         weights = json.load(f)
         return weights
 
-def set_weights(popularity: float, recency: float, relevancy: float) -> bool:
-    """Sets weights 
+def _set_weights(popularity: float, recency: float, relevancy: float) -> bool:
+    """Sets weights as specified.
     """
     if popularity + recency + relevancy != 1.0:
         return False
