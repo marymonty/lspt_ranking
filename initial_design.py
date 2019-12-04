@@ -143,7 +143,7 @@ def _get_metadata_score(doc_ids: [any]) -> {any : any}:
     """
     dds_data = json.dumps("")
     #I know the endpoint is "/documents" to get all docs, but I'm not sure the rest of the url
-    response = requests.get("lspt-dds.cs.rpi.edu/documents")
+    response = requests.get("lspt-dds2.cs.rpi.edu/documents")
     if (response.status_code == 200):
         dds_data = response.json()
     return dds_data
