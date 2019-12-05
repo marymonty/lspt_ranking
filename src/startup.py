@@ -5,7 +5,7 @@ import json
 import sys
 from shutil import copyfile
 
-from defines import POPULARITY, RECENCY, RELEVANCY, ENDPOINT_PATH, WEIGHT_PATH
+from .defines import POPULARITY, RECENCY, RELEVANCY, ENDPOINT_PATH, WEIGHT_PATH
 
 def startup():
     """Initializes the server, paths within the server, and stable storage.

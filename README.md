@@ -37,7 +37,7 @@ $ http localhost:8000
 ```
 # To request the rankings for a certain query (for example, "apple banana"), call the endpoint with the request in list form.
 ```
-$ http localhost:8000/ranking?query=[\"apple\",\"banana\"]
+$ http localhost:8000/ranking?query="apple banana"
 ```
 
 # Further reading regarding Falcon:  
