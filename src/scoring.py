@@ -8,6 +8,6 @@ def make_scores(docs_relevancy: {any : float},
     weights = get_weights()
     scores = {}
     for docid in docs_relevancy.keys():
-        scores[docid] = docs_relevancy[docid]*weights.get(RELEVANCY) + \
-                        docs_centrality[docid]*weights.get(CENTRALITY)
+        scores[docid] = str(docs_relevancy[docid]*weights.get(RELEVANCY) + \
+                        docs_centrality[docid]*weights.get(CENTRALITY))
     return scores
