@@ -6,7 +6,7 @@ from .controller import GET
 CORRECT_REQUEST = """Error request format. The request must contain query=[string].
 Optional fields include n_results = int"""
 
-class Resource(object):
+class Query(object):
 
     def on_post(self, req, resp):
         # Extract the query and fields from the request.

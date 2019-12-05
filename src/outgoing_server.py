@@ -3,9 +3,9 @@
 import json
 import requests
 from .defines import ENDPOINT_PATH, TT, INDEXING, DDS, LINKAN
-from .errors import EndpointException
+from .errors import EndpointException, ServerErrorCode
 
-MOCKED = True
+MOCKED = False
 
 def make_get_request(endpoint: str, data: {}) -> {}:
     """Makes a GET request to the endpoint specified with the params passed in.
@@ -34,10 +34,15 @@ def make_get_request(endpoint: str, data: {}) -> {}:
 
     if endpoint not in endpoints:
         raise EndpointException("Endpoint called does not exist.")
+    
+    res = requests.post(url=endpoints.get(endpoint), data=data)
 
-    res = requests.post(url=endpoints.get(url='url', data=data))
-
-    return res
+    if res.status_code != 200:
+        raise ServerErrorCode("Call to endpoint %s \
+                failed with code with result object" \
+                % endpoint, res.status_code, res)
+    
+    return json.loads(res.text)
 
 
 def return_mock(endpoint: str):
