@@ -3,11 +3,10 @@
 
 import os
 import json
-from typing import Union  # Used to represent more than one return data type.
-from defines import WEIGHT_PATH, POPULARITY, RELEVANCY, RECENCY
-from errors import WeightNotExist
+from .defines import WEIGHT_PATH, RELEVANCY, CENTRALITY
+from .errors import WeightNotExist
 
-def _get_weights() -> {}:
+def get_weights() -> {}:
     """Retrieves the weights to be used from stable storage.
 
     Raises:
@@ -23,7 +22,7 @@ def _get_weights() -> {}:
         weights = json.load(file)
         return weights
 
-def _set_weights(popularity: float, recency: float, relevancy: float) -> Union[bool, {any : float}]:
+def _set_weights(relevancy: float, centrality: float) -> bool:
     """Sets weights on local storage as specified.
 
     Ensures that the weights passed in sum to 1.0. If they do, converts them to a JSON string,
@@ -42,9 +41,9 @@ def _set_weights(popularity: float, recency: float, relevancy: float) -> Union[b
         Otherwise, the weights are updated in file, and are returned to the user in
         dictionary form.
     """
-    if popularity + recency + relevancy != 1.0:
+    if centrality + relevancy != 1.0:
         return False
-    weights = {POPULARITY: popularity, RECENCY: recency, RELEVANCY: relevancy}
+    weights = {RELEVANCY: relevancy, CENTRALITY: centrality}
 
     with open(WEIGHT_PATH, 'w') as file:
         weights = json.load(file)
