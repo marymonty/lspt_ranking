@@ -8,10 +8,11 @@ Optional fields include n_results = int"""
 
 class Resource(object):
 
-    def on_get(self, req, resp):
+    def on_post(self, req, resp):
         # Extract the query and fields from the request.
-        to_rank = req.params.get('query', '')
-        n_results = req.params.get('n_results', 50)
+        req_body = json.loads(req.stream.read().decode('ascii'))
+        to_rank = req_body.get('query', '')
+        n_results = int(req_body.get('results', '50'))
 
         # Check that the query is well-formed.
         if to_rank == '' or \

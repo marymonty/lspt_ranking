@@ -7,6 +7,6 @@ def GET(words: str, n_results: int) -> {any : str}:
     docs = docs_relevancy.keys()
 
     docs_centrality = get_centrality(docs)
-    scored_docs = make_scores(docs_relevancy, docs_centrality)
+    scored_docs = make_scores(docs_relevancy, docs_centrality, n_results)
     return scored_docs
     

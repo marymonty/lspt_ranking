@@ -7,5 +7,7 @@ startup()
 
 api = application = falcon.API()
 
+application.req_options.auto_parse_form_urlencoded=True
+
 ranking = Resource()
-api.add_route('/ranking', ranking)
+api.add_route('/search', ranking)
