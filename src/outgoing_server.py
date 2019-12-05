@@ -2,10 +2,12 @@
 """
 import json
 import requests
-from defines import ENDPOINT_PATH
-from errors import EndpointException
+from .defines import ENDPOINT_PATH, TT, INDEXING, DDS, LINKAN
+from .errors import EndpointException
 
-def _make_get_request(endpoint: str, params: {}) -> {}:
+MOCKED = True
+
+def make_get_request(endpoint: str, data: {}) -> {}:
     """Makes a GET request to the endpoint specified with the params passed in.
 
     Ensures that the endpoint to be called is detailed as trusted and known on the
@@ -24,12 +26,43 @@ def _make_get_request(endpoint: str, params: {}) -> {}:
     Returns:
         The GET request's corresponding response.
     """
+    if MOCKED:
+        return json.loads(return_mock(endpoint))
+
     with open(ENDPOINT_PATH, 'r') as file:
         endpoints = json.load(file)
 
     if endpoint not in endpoints:
         raise EndpointException("Endpoint called does not exist.")
 
-    res = requests.get(url=endpoints.get(url='url', params=params))
+    res = requests.post(url=endpoints.get(url='url', data=data))
 
+    return res
+
+
+def return_mock(endpoint: str):
+    res = ""
+    if endpoint == TT:
+        res = json.dumps({
+	        "stripped": "hello world",
+	        "grams": {
+                1: {"hello": [0, 1], "world": [2]}, 
+                2: {"hello hello": [0], "hello world": [1]}, 
+                3: {"hello hello world": [0]}
+            },
+	        "title": "Hello World"
+        })
+    elif endpoint == LINKAN:
+        res = json.dumps({
+            "0" : 0.3,
+            "1" : 0.3,
+            "2" : 0.3
+        })
+    elif endpoint == INDEXING:
+        res = json.dumps({
+            "hello world": {"0": {"tf-idf": 0.11194170287483966}, "1": {"tf-idf": 0.38544484153148295},
+	        "2": {"tf-idf": 0.12412684823499272}}
+        })
+    else: 
+        raise EndpointException
     return res
