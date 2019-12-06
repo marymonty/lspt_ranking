@@ -3,24 +3,40 @@ import json
 import falcon
 from .controller import GET
 
-CORRECT_REQUEST = """Error request format. The request must contain query=[string].
+from .errors import EndpointException, ServerErrorCode
+
+CORRECT_REQUEST = """Error request format. The request must contain query="string".
 Optional fields include n_results = int"""
+
 
 class Query(object):
 
     def on_post(self, req, resp):
         # Extract the query and fields from the request.
-        req_body = json.loads(req.stream.read().decode('ascii'))
-        to_rank = req_body.get('query', '')
-        n_results = int(req_body.get('results', '50'))
+        bad_req = False
+        try:
+            req_body = json.loads(req.stream.read().decode('ascii'))
+            to_rank = req_body.get('query', '')
+            n_results = int(req_body.get('results', '50'))
+        except ValueError:
+            bad_req = True
 
         # Check that the query is well-formed.
-        if to_rank == '' or \
+        if bad_req or to_rank == '' or \
             not isinstance(to_rank, str):
             resp.body = CORRECT_REQUEST
             resp.status = falcon.HTTP_400
         else:
-            results = GET(to_rank, n_results)
+            try:
+                results = GET(to_rank, n_results)
+            except EndpointException as e:
+                resp.status = falcon.HTTP_503
+                resp.body = "Could not connect to endpoint %s" % e.endpoint
+                return
+            except ServerErrorCode as e:
+                resp.status = falcon.HTTP_503
+                resp.body = "Connect to endpoint %s returned a non-200 code" % e.endpoint
+                return
 
             # Create a JSON representation of the resource.
             resp.body = json.dumps(results, ensure_ascii=False)
