@@ -15,9 +15,10 @@ class Query(object):
         # Extract the query and fields from the request.
         bad_req = False
         try:
-            req_body = json.loads(req.stream.read().decode('ascii'))
-            to_rank = req_body.get('query', '')
-            n_results = int(req_body.get('results', '50'))
+            to_rank = req.get_param('query', required=True)
+            n_results = req.get_param('results', required=False)
+            if n_results == None:
+                n_results = 50
         except ValueError:
             bad_req = True
 
