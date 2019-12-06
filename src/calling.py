@@ -5,8 +5,7 @@ from .controller import GET
 
 from .errors import EndpointException, ServerErrorCode
 
-CORRECT_REQUEST = """Error request format. The request must contain query="string".
-Optional fields include n_results = int"""
+CORRECT_REQUEST = "ERROR: Query paramater must be a string of length greater than 0\n"
 
 
 class Query(object):
@@ -32,11 +31,11 @@ class Query(object):
                 results = GET(to_rank, n_results)
             except EndpointException as e:
                 resp.status = falcon.HTTP_503
-                resp.body = "Could not connect to endpoint %s" % e.endpoint
+                resp.body = "ERROR: Could not connect to endpoint %s\n" % e.endpoint
                 return
             except ServerErrorCode as e:
                 resp.status = falcon.HTTP_503
-                resp.body = "Connect to endpoint %s returned a non-200 code" % e.endpoint
+                resp.body = "ERROR: Connect to endpoint %s returned a non-200 code\n" % e.endpoint
                 return
 
             # Create a JSON representation of the resource.
