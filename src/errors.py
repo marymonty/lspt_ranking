@@ -15,7 +15,7 @@ class EndpointException(Exception):
     	Takes the arguments and creates an informative message for the user
     	to know what exception is being thrown and why. 
     	Args:
-    		self: the server
+    		self: the EndpointException object
     		message: the message that will be returned to the user
     		endpoint: the endpoint to send the message to
     	Returns: 
@@ -35,7 +35,7 @@ class WeightNotExist(Exception):
     	Takes the arguments and creates an informative message for the user
     	to know what exception is being thrown and why.  
     	Args:
-    		self: the server
+    		self: the WeightNotExist object
     		message: the message that will be returned to the user
     	Returns: 
     		none
@@ -51,7 +51,7 @@ class ServerErrorCode(Exception):
     	Takes the arguments and creates an informative message for the user
     	to know what exception is being thrown and why. 
 		Args:
-    		self: the server
+    		self: the ServerErrorCode object
     		message: the message that will be returned to the user
     		endpoint: the endpoint to send the message to
     	Returns: 
