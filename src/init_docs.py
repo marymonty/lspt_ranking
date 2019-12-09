@@ -13,7 +13,8 @@ Typical usage example:
         { docID1 : [tf: float, idf: float, tf-idf: float],
           docID2 : [tf: float, idf: float, tf-idf: float] ... }
     Our final document dictionary will look like this:
-        { docID1 : prelim_score as float }
+        { docID1 : prelim_score as float,
+          docID2 : prelim_score as float, ...}
 """
 from .outgoing_server import make_get_request
 from .defines import INDEXING, TT
