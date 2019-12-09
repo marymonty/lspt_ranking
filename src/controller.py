@@ -10,7 +10,7 @@ Typical usage example:
 	We receive a query, "where in new york is rpi" and the int 300, which
 	means querying wants 300 results. We send this query to other modules which
 	return docs, the updated dictionary of document ids and their associated
-	scores. We end with the final docs list with their scores.
+	scores. We end with the final docs list with their accompanying ranked scores.
 """
 from .init_docs import get_prelim_docs_and_scores
 from .centrality import get_centrality
