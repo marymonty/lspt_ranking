@@ -35,7 +35,7 @@ def make_get_request(endpoint: str, data: {}) -> {}:
     if endpoint not in endpoints:
         raise EndpointException("Endpoint called does not exist.")
     try:
-        res = requests.post(url=endpoints.get(endpoint), data=data)
+        res = requests.post(url=endpoints.get(endpoint), json=data)
     except requests.exceptions.ConnectionError:
         raise EndpointException("Invalid endpoint %s" % endpoint, endpoint)
 
