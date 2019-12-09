@@ -5,7 +5,7 @@ def get_prelim_docs_and_scores(words: str) -> {any : float}:
     tt_req = _make_tt_req(words)
     tt_res = make_get_request(TT, tt_req)
     idx_req = _make_idx_req(tt_res)
-    idx_res = make_get_request(INDEXING, tt_req)
+    idx_res = make_get_request(INDEXING, idx_req)
     docs = _get_docs_and_scores(idx_res)
     return docs
 
