@@ -42,3 +42,6 @@ $ http localhost:8000/ranking?query="apple banana"
 
 # Further reading regarding Falcon:  
 https://falcon.readthedocs.io/en/stable/user/tutorial.html
+
+# To run on the server the command is:
+sudo gunicorn3 lspt_ranking.app -b :80

@@ -5,7 +5,7 @@ import json
 import sys
 from shutil import copyfile
 
-from .defines import POPULARITY, RECENCY, RELEVANCY, ENDPOINT_PATH, WEIGHT_PATH
+from .defines import RELEVANCY, CENTRALITY, ENDPOINT_PATH, WEIGHT_PATH
 
 def startup():
     """Initializes the server, paths within the server, and stable storage.
@@ -24,7 +24,7 @@ def create_storage():
         os.mkdir('lspt_ranking/bin')
     if not os.path.exists('lspt_ranking/bin/weight_file.json'):
         with open(WEIGHT_PATH, mode='w+') as file:
-            def_weights = {POPULARITY: 0.34, RECENCY: 0.33, RELEVANCY: 0.33}
+            def_weights = {RELEVANCY: 0.5, CENTRALITY: 0.5}
             file.write(json.dumps(def_weights))
 
 def add_server_paths():

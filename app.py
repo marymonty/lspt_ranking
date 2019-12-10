@@ -1,11 +1,13 @@
 import falcon
 
-from .src.calling import Resource
+from .src.calling import Query
 from .src.startup import startup
 
 startup()
 
 api = application = falcon.API()
 
-ranking = Resource()
-api.add_route('/ranking', ranking)
+application.req_options.auto_parse_form_urlencoded=True
+
+ranking = Query()
+api.add_route('/search', ranking)
