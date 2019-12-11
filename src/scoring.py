@@ -3,7 +3,15 @@
 Weighted compilation of all gathered scores and filtering of top N results.
 
 Typical usage example:
-    If 
+    docs_relevancy =
+        { docID1 : 0.2,
+          docID2 : 0.1}
+    docs_centrality =
+        { docID1 : 0.3,
+          docID2 : 0.1}
+    n_results = 1
+
+    ranked_scores = make_scores(docs_relevancy, docs_centrality, n_results)
 """
 from .local_weights import get_weights
 from .defines import RELEVANCY, CENTRALITY
