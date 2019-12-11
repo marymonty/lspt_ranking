@@ -1,8 +1,9 @@
 """Implementation of Text Transformation and Indexing communication.
-Module description: 
-    In this file, we call the Text Transformation and Indexing endpoints. 
-    We then create a dictionary of document id's and their preliminary scores
-    made from the TT n_grams and Indexing occurrance scores.
+
+In this file, we call the Text Transformation and Indexing endpoints. 
+We then create a dictionary of document id's and their preliminary scores
+made from the TT n_grams and Indexing occurrance scores.
+
 Typical usage example:
     If the query is "where in new york is rpi", the resulting n-grams would be:
         unigrams: [where, new, york, rpi],
@@ -27,7 +28,7 @@ def get_prelim_docs_and_scores(words: str) -> {any : float}:
     Args:
         words: The query, represented as a string.
     Returns:
-        docs: a JSON string list of document IDs, with their respective TF, IDF, and TF-IDF scores,
+        A JSON string list of document IDs, with their respective TF, IDF, and TF-IDF scores,
         as floats.
         The overall resulting form is like so:
             { docID1 : [tf: float, idf: float, tf-idf: float],
@@ -41,7 +42,7 @@ def get_prelim_docs_and_scores(words: str) -> {any : float}:
     return docs
 
 def _make_tt_req(words: str):
-    """Creates the formatted Text Transformation request json.
+    """Creates the formatted Text Transformation request JSON.
     Following the Text Transformation API, create the properly formatted
     json string that will be sent to the TT endpoint for them to extract 
     x number of n-grams from. This request gets returned to the 
@@ -49,7 +50,8 @@ def _make_tt_req(words: str):
     Args:
         words: the query, represented as a string.
     Returns:
-        req: the JSON string of what format we are requesting from Text Transformation
+        A JSON string of what format we are requesting from Text
+        Transformation (TT).
     """
     req = {
         "type" : "text",
@@ -70,7 +72,7 @@ def _make_idx_req(tt_res):
     Args:
         tt_res: the text transformation response, a JSON string.
     Returns:
-        n_grams: the list of n_grams from the tt response
+        A list of n_grams from the TT service response.
     """
     n_grams = []
     for _, grams_occ in tt_res.get("grams").items():
@@ -80,12 +82,14 @@ def _make_idx_req(tt_res):
 
 def _get_docs_and_scores(idx_res):
     """Creating the dictionary of documents and their occurrance scores.
-    Go through the index response to find all the document data to create the keys
-    in the docs dictionary. _add_prelim_scores will be called to add the values.
+    Go through the index response to find all the document data to create the
+    keys in the docs dictionary.
+    _add_prelim_scores will be called to add the values.
     Args:
-        idx_res: the response from indexing of a JSON with documents and occurrance scores.
+        idx_res: the response from indexing of a JSON with documents and
+        occurrance scores.
     Returns:
-        docs: the dictionary of documents and their initial scores.
+        A dictionary of documents IDs mapped to their initial scores.
     """
     docs = {}
     for n_gram, docdata in idx_res.items():
@@ -100,11 +104,12 @@ def _add_prelim_scores(docs: {any, float}, idx_res):
     document to fill the values of our docs dictionary. This function changes the docs
     dictionary, without returning anything.
     Args:
-        docs: the document dictionary, which hold the document ID as the key,
-        and the prelim score as a float as the value.
-        idx_res: the response from indexing of a JSON with documents and occurrance scores.
+        docs: A document dictionary with document ID keys mapped to their
+        prelim scores as a float as the value.
+        idx_res: Indexing's JSON response of doc IDs and their respective
+        occurrance scores.
     Returns:
-        none
+        Does not return anything.
     """
     mx_val = 0
     for n_gram, docdata in idx_res.items():
