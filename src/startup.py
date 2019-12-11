@@ -1,4 +1,8 @@
 """Initializes and performs necessary startup operations for the Ranking team's server.
+
+Typical usage example:
+    # Initialize the service.
+    startup()
 """
 import os
 import json

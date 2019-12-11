@@ -1,4 +1,9 @@
 """Contains functionality for retrieving and setting the weight values stored locally.
+
+Typical usage example:
+    set = _set_weights(0.1, 0.2)
+    if set:
+        weights = get_weights()
 """
 
 import os

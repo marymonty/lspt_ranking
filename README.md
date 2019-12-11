@@ -8,6 +8,7 @@
 
 ## Hostname: lspt-rank2.cs.rpi.edu
 ## Port: 80
+## Final deliverable: [Project 2 Group Writeup](https://docs.google.com/document/d/1y1OiSKjwjNEpCe4G9K2eamGhs2aEQGn4XWSEWre8DVA/edit?usp=sharing)
 
 ## Overview
 * Main repository for the Ranking team to store their project component for Large Scale Programming & Testing's class-wide search engine.
@@ -17,7 +18,12 @@
 * Other services can request rankings of specific document IDs through the GET functionality.
 
 ## Instructions For Use
-### To set up server from an empty directory.
+### Download and setup the server as stipulated in Instructions For Setup below.
+### To run on the server the command is:
+sudo gunicorn3 lspt_ranking.app -b :80
+
+## Instructions For Setup
+### To set up the server from an empty directory.
 ```
 $ mkdir lspt_ranking  
 $ cd lspt_ranking  
@@ -36,7 +42,7 @@ lspt_ranking
   └── app.py  
 ```
 
-#### To run the server, open up a terminal and enter the following:
+### To run the server, open up a terminal and enter the following:
 ```
 $ source .venv/bin/activate  
 $ pip install gunicorn  
@@ -54,8 +60,5 @@ $ http localhost:8000
 $ http localhost:8000/ranking?query="apple banana"
 ```
 
-### Further reading regarding Falcon:  
+#### Further reading regarding Falcon:  
 https://falcon.readthedocs.io/en/stable/user/tutorial.html
-
-### To run on the server the command is:
-sudo gunicorn3 lspt_ranking.app -b :80
