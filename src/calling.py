@@ -1,8 +1,9 @@
 """Module to create and check the Query object.
-Module description: 
-    A class for a Query, used to check that the given query can be made into
-    a json object and that falcon can successfully connect to the endpoint for
-    further computation.
+
+A class for a Query, used to check that the given query can be made into
+a JSON object, and that Falcon can successfully connect to the endpoint for
+further computation.
+
 Typical usage example:
     We receive query {query: "where in new york is rpi"}
     this query can be successfully made into a json string
@@ -21,6 +22,7 @@ CORRECT_REQUEST = "ERROR: Query paramater must be a string of length greater tha
 
 class Query(object):
     """A class to represent a Query object.
+
     A query is what is sent to us. We need to transform and perform computations
     on this query, so we have made it into an object to be easier dealt with here.
     We are checking to see if the Query is something that we can deal with.
@@ -29,18 +31,17 @@ class Query(object):
     def on_post(self, req, resp):
         """Creates a json out of the query, if possible.
         This function will put the given Query object through tests to 
-        see if if this input sent to us is in the proper format of what
-        we are asking for. If it is, we will convert the query into a json 
-        string and use it from there.
+        see it is properly formatted.
+        If it is, we will convert the query into a JSON string and continue.
         Args:
-            self: the Query object
-            req: the request, what querying sent to us
-            resp: the response
+            self: the Query object.
+            req: The request, what querying sent to us.
+            resp: What the response will be returned through.
         Raises:
-            EndpointException if fails to connect to endpoint
-            ServerErrorCode if connection to endpoint does not return 200 (success)
+            EndpointException: Failure to connect to endpoint
+            ServerErrorCode: Connection to endpoint does not return 200 (success).
         Returns:
-            none: unless exception is thrown, return to exit
+            Does not return anything.
         """
         # Extract the query and fields from the request.
         bad_req = False

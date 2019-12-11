@@ -10,7 +10,7 @@ def get_weights() -> {}:
     """Retrieves the weights to be used from stable storage.
 
     Raises:
-            WeightNotExist: If weights file does not exist.
+        WeightNotExist: If weights file does not exist.
 
     Returns:
         A dictionary with the float weight values.
