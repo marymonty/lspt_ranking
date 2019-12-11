@@ -41,7 +41,7 @@ def get_prelim_docs_and_scores(words: str) -> {any : float}:
     docs = _get_docs_and_scores(idx_res)
     return docs
 
-def _make_tt_req(words: str):
+def _make_tt_req(words: str) -> str:
     """Creates the formatted Text Transformation request JSON.
     Following the Text Transformation API, create the properly formatted
     json string that will be sent to the TT endpoint for them to extract 
@@ -64,7 +64,7 @@ def _make_tt_req(words: str):
     }
     return req
 
-def _make_idx_req(tt_res):
+def _make_idx_req(tt_res) -> [str]:
     """Collecting the n-grams from the Text Transformation response.
     Goes through the Text Transformation response to find all the n_grams 
     then appends it to a list of n_grams, which gets returned to 
@@ -80,7 +80,7 @@ def _make_idx_req(tt_res):
             n_grams.append(gram)
     return n_grams
 
-def _get_docs_and_scores(idx_res):
+def _get_docs_and_scores(idx_res) -> {any : float}:
     """Creating the dictionary of documents and their occurrance scores.
     Go through the index response to find all the document data to create the
     keys in the docs dictionary.
