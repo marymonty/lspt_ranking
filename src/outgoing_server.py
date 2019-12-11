@@ -25,7 +25,8 @@ def make_get_request(endpoint: str, data: {}) -> {}:
     Raises:
         EndpointException: When the endpoint called is not known; it does not exist
         in the endpoints.json file on the server.
-
+	ServerErrorCode: When the GET request to the endpoint fails.
+	
     Returns:
         The GET request's corresponding response.
     """
