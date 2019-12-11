@@ -1,0 +1,4 @@
+__pycache__/
+bin/
+.vscode/settings.json
+endpoints.json
