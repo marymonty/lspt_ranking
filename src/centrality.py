@@ -5,7 +5,7 @@ as a JSON string. In return, Link analysis returns a JSON of each docIDs
 PageRank score. These PageRank scores are scaled and put into our internal
 docs dict.
 
-    Typical usage example:
+Typical usage example:
     We start with docs, our document dictionary, which would look like this:
     { docID1 : prelim_score as float,
       docID2 : prelim_score as float, ...}

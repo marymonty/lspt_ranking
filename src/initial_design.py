@@ -1,4 +1,4 @@
-"""Implementation of ranking team functionality.
+"""Initial prototype of the Ranking service.
 TODO: Write up overall description of the module or program, as well as contain a typical usage
 example.
 """

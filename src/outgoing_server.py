@@ -1,4 +1,7 @@
 """Contains functionality for communicating with external teams.
+
+Typical usage example:
+    make_get_request(MOCKED)
 """
 import json
 import requests
@@ -48,6 +51,16 @@ def make_get_request(endpoint: str, data: {}) -> {}:
 
 
 def return_mock(endpoint: str):
+    """Function used to mock other services for testing purposes.
+
+    Args:
+        endpoint: The endpoint to be mocked.
+    Raises:
+        EndpointException: When the endpoint called is not a predefined
+        constant within the endpoints.json file on the server.
+    Returns:
+        An appropriate mocked response from the corresponding endpoint called.
+    """
     res = ""
     if endpoint == TT:
         res = json.dumps({
