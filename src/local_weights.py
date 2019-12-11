@@ -36,9 +36,8 @@ def _set_weights(relevancy: float, centrality: float) -> bool:
 
     Args:
         popularity: A float representative of how much the popularity metric is weighted.
-        recency: A float representative of how much the float metric is weighted.
-        relevancy: A float representative of how much the relevancy metric is weighted.
-
+        centrality: A float representative of how much the centrality metric is weighted.
+        
     Returns:
         If the weights specified do not sum up to 1.0 (i.e. are not normalized), a False
         boolean is returned to the function caller. It is up to the function caller to
