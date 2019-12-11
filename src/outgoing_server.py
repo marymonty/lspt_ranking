@@ -20,7 +20,7 @@ def make_get_request(endpoint: str, data: {}) -> {}:
 
     Args:
         endpoint: Endpoint's name.
-        params: The outgoing GET request's parameters.
+        data: The outgoing GET request's parameters.
 
     Raises:
         EndpointException: When the endpoint called is not known; it does not exist
